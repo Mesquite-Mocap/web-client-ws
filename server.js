@@ -5,11 +5,11 @@ const url = require('url');
 
 const WebSocket = require('ws');
 
-const port = parseInt(process.argv.slice(2));
+const port = 3000;
 
-const express_config= require('./config/express.js');
+// const express_config= require('./config/express.js');
 
-express_config.init(app);
+// express_config.init(app);
 
 const wss1 = new WebSocket.Server({ noServer: true });
 const wss2 = new WebSocket.Server({ noServer: true });
@@ -21,6 +21,7 @@ var cameraArray={};
 //sensor nodes
 wss1.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
+	console.log(message.toString());
     wss2.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -29,7 +30,7 @@ wss1.on('connection', function connection(ws) {
   });
 });
 
-//webbrowser 
+//webbrowser
 wss2.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
   	// nothing here should be received
@@ -63,5 +64,3 @@ app.use(express.static(__dirname + '/public'));
 server.listen(port, () => {
 	  console.log(`App listening at http://localhost:${port}`)
 })
-
-

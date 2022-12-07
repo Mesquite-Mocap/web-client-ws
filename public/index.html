@@ -61,13 +61,14 @@ function connect() {
   };
 
   ws.onmessage = function(e) {
-   // console.log('Message:', e.data);
+    e.data.text().then(function(text){
     try{
-      var obj = JSON.parse(e.data);
+      var obj = JSON.parse(text)
       handleWSMessage(obj);
     }
     catch(e){
     }
+	})
   };
 
   ws.onclose = function(e) {
