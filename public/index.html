@@ -52,7 +52,7 @@
 			animate();
 
 function connect() {
-  var ws = new WebSocket('ws://localhost:3000');
+  var ws = new WebSocket('ws://localhost:3000/client');
   ws.onopen = function() {
     // subscribe to some channels
     ws.send(JSON.stringify({
