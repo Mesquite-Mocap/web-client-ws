@@ -18,7 +18,7 @@ const wss2 = new WebSocket.Server({ noServer: true });
 
 var cameraArray={};
 
-//esp32cam websocket
+//sensor nodes
 wss1.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
     wss2.clients.forEach(function each(client) {
@@ -29,7 +29,7 @@ wss1.on('connection', function connection(ws) {
   });
 });
 
-//webbrowser websocket
+//webbrowser 
 wss2.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
   	// nothing here should be received
@@ -40,11 +40,11 @@ wss2.on('connection', function connection(ws) {
 server.on('upgrade', function upgrade(request, socket, head) {
   const pathname = url.parse(request.url).pathname;
 
-  if (pathname === '/jpgstream_server') {
+  if (pathname === '/hub') {
     wss1.handleUpgrade(request, socket, head, function done(ws) {
       wss1.emit('connection', ws, request);
     });
-  } else if (pathname === '/jpgstream_client') {
+  } else if (pathname === '/web_client') {
     wss2.handleUpgrade(request, socket, head, function done(ws) {
       wss2.emit('connection', ws, request);
     });
