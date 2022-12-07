@@ -6,6 +6,7 @@ var methodOverride = require('method-override');
 var hostname = process.env.HOSTNAME || 'localhost';
 const WebSocket = require('ws')
 var values = {}
+var mappings = require('./public/mappings.js');
 
 
 
@@ -13,10 +14,18 @@ const wss = new WebSocket.Server({ port: 3000})
 
 wss.on('connection', ws => {
   ws.on('message', message => {
- //    console.log(`Received message => ${message}`)
+    // console.log(`Received message => ${message}`)
      wss.clients.forEach(function each(client) {
        client.send(`${message}`);
      });
+
+     // try{
+     //    var obj = JSON.parse(message);
+     //    console.log(obj);
+     //    mappings.handleWSMessage(obj);
+     // }
+     // catch(e){
+     // }
   })
   ws.send('start');
 })
