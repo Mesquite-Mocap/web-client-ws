@@ -21,7 +21,7 @@ var cameraArray={};
 //sensor nodes
 wss1.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
-	console.log(message.toString());
+	// console.log(message.toString());
     wss2.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);

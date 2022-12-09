@@ -22,23 +22,47 @@ function handleWSMessage(obj) {
       var qR = q.mul(qC);
       // console.log(obj.id);
 
-      if(mac2Bones[obj.id].id in dependencyGraph) {
-          var parent = getQuaternion(dependencyGraph[mac2Bones[obj.id].id]);
-          if(parent != null) {
-              var q1 = new Quaternion(qR.x, qR.y, qR.z, qR.w);
-              var qC1 = parent
-              var qR1 = q1.mul(qC1);
-              x.quaternion.set(qR1.z, -qR1.y, qR1.x, qR1.w);
-          } else {
-              x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
-          }
+      if(mac2Bones[obj.id].id == "Hips") {
+        x.quaternion.set(qR.z, qR.x, qR.y, qR.w);
+      } else if(mac2Bones[obj.id].id == "Hips") {
+        x.quaternion.set(qR.z, qR.x, qR.y, qR.w);
       } else {
-          x.quaternion.set(qR.x, qR.y, qR.z, -qR.w);
-          mac2Bones[obj.id].global.x = qR.x;
-          mac2Bones[obj.id].global.y = qR.y;
-          mac2Bones[obj.id].global.z = qR.z;
-          mac2Bones[obj.id].global.w = qR.w;
+        if(mac2Bones[obj.id].id in dependencyGraph) {
+            var parent = getQuaternion(dependencyGraph[mac2Bones[obj.id].id]);
+            if(parent != null) {
+                var q1 = new Quaternion(qR.x, qR.y, qR.z, qR.w);
+                var qC1 = parent
+                var qR1 = q1.mul(qC1);
+                x.quaternion.set(qR1.z, -qR1.y, qR1.x, qR1.w);
+            } else {
+                x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
+            }
+        } else {
+            x.quaternion.set(qR.x, qR.y, qR.z, -qR.w);
+            mac2Bones[obj.id].global.x = qR.x;
+            mac2Bones[obj.id].global.y = qR.y;
+            mac2Bones[obj.id].global.z = qR.z;
+            mac2Bones[obj.id].global.w = qR.w;
+        }
       }
+
+      // if(mac2Bones[obj.id].id in dependencyGraph) {
+      //     var parent = getQuaternion(dependencyGraph[mac2Bones[obj.id].id]);
+      //     if(parent != null) {
+      //         var q1 = new Quaternion(qR.x, qR.y, qR.z, qR.w);
+      //         var qC1 = parent
+      //         var qR1 = q1.mul(qC1);
+      //         x.quaternion.set(qR1.z, -qR1.y, qR1.x, qR1.w);
+      //     } else {
+      //         x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
+      //     }
+      // } else {
+      //     x.quaternion.set(qR.x, qR.y, qR.z, -qR.w);
+      //     mac2Bones[obj.id].global.x = qR.x;
+      //     mac2Bones[obj.id].global.y = qR.y;
+      //     mac2Bones[obj.id].global.z = qR.z;
+      //     mac2Bones[obj.id].global.w = qR.w;
+      // }
 }
 
 function getQuaternion(id) {
