@@ -20,51 +20,40 @@ function handleWSMessage(obj) {
       var q = new Quaternion(obj.x, obj.y, obj.z, obj.w);
       var qC = new Quaternion(mac2Bones[obj.id].calibration.x,mac2Bones[obj.id].calibration.y,mac2Bones[obj.id].calibration.z,mac2Bones[obj.id].calibration.w).inverse()
       var qR = q.mul(qC);
-      // console.log(obj.id);
+      
+    switch (bone) {
+        case "Hips":
+            x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
+            break;
+        case "Spine":
+            x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
+            break;
+            default:
+            x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
+            break;
+    }
 
-        if(mac2Bones[obj.id].id in dependencyGraph) {
-            var parent = getQuaternion(dependencyGraph[mac2Bones[obj.id].id]);
-            if(parent != null) {
+    /*
+    if(mac2Bones[obj.id].id in dependencyGraph) {
+            var parentNode = getparentNodeQuaternion(obj.id);
+            if(parentNode != null) {
                 var q1 = new Quaternion(qR.x, qR.y, qR.z, qR.w);
-                var qC1 = parent
+                var qC1 = parentNode
                 var qR1 = q1.mul(qC1);
                 qR = JSON.parse(JSON.stringify(qR1));
             } 
-        } else {
+        }
             mac2Bones[obj.id].global.x = qR.x;
             mac2Bones[obj.id].global.y = qR.y;
             mac2Bones[obj.id].global.z = qR.z;
             mac2Bones[obj.id].global.w = qR.w;
-        }
-      if(mac2Bones[obj.id].id == "Hips") {
-        x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
-      } else if(mac2Bones[obj.id].id == "Spine") {
-        x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
-      }
-        else {
-        x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
-        }
+    */
+        
 
-      // if(mac2Bones[obj.id].id in dependencyGraph) {
-      //     var parent = getQuaternion(dependencyGraph[mac2Bones[obj.id].id]);
-      //     if(parent != null) {
-      //         var q1 = new Quaternion(qR.x, qR.y, qR.z, qR.w);
-      //         var qC1 = parent
-      //         var qR1 = q1.mul(qC1);
-      //         x.quaternion.set(qR1.z, -qR1.y, qR1.x, qR1.w);
-      //     } else {
-      //         x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
-      //     }
-      // } else {
-      //     x.quaternion.set(qR.x, qR.y, qR.z, -qR.w);
-      //     mac2Bones[obj.id].global.x = qR.x;
-      //     mac2Bones[obj.id].global.y = qR.y;
-      //     mac2Bones[obj.id].global.z = qR.z;
-      //     mac2Bones[obj.id].global.w = qR.w;
-      // }
 }
 
-function getQuaternion(id) {
+function getparentNodeQuaternion(child) {
+      var id = dependencyGraph([mac2Bones[child].id]);
       var keys = Object.keys(mac2Bones);
       for(var i = 0; i < keys.length; i++) {
           if(mac2Bones[keys[i]].id == id) {
