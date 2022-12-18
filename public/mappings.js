@@ -29,8 +29,8 @@ var mac2Bones = {
 var dependencyGraph = {
   "LeftForeArm" : "LeftArm",
   "RightForeArm": "RightArm",
-  "RightForeArm": "Spine",
-  "LeftForeArm": "Spine",
-  "Head": "",
+  "LeftArm": "Spine",
+  "RightArm": "Spine",
+  "Head": "Spine",
   "Spine": "Hips",
 }
