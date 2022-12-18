@@ -40,12 +40,12 @@ function handleWSMessage(obj) {
       setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
       break;
     case "RightArm":
-      var q1 = new Quaternion(qR.x, qR.z, qR.y, qR.w);
+      var q1 = new Quaternion(qR.y, qR.x, -qR.z, qR.w);
       var qC1 = getparentNodeQuaternion(obj.id);
       var qR1 = q1.mul(qC1);
       qR = JSON.parse(JSON.stringify(qR1));
-      x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
-      setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
+      x.quaternion.set(qR.y, qR.x, -qR.z, qR.w);
+      setGlobal(obj.id, qR.y, qR.x, -qR.z, qR.w);
       break;
     default:
       x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
