@@ -1,3 +1,13 @@
+function qte(q0,q1,q2,q3) {
+  const Rx = Math.atan2(2 * (q0 * q1 + q2 * q3), 1 - (2 * (q1 * q1 + q2 * q2)));
+  const Ry = Math.asin(2 * (q0 * q2 - q3 * q1));
+  const Rz = Math.atan2(2 * (q0 * q3 + q1 * q2), 1 - (2  * (q2 * q2 + q3 * q3)));
+
+  const euler = {x:Rx, y:Ry, z:Rz};
+
+  return(euler);
+}
+
 var rigPrefix = "mixamorig";
 
 function calibrate() {
@@ -28,15 +38,17 @@ function handleWSMessage(obj) {
 
   switch (bone) {
     case "Hips":
-      x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
+        var e = qte(qR.z, qR.y, qR.w, qR.x);
+      x.rotation.set(e.x, Math.PI-e.y, e.z);
+     // x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
       setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
       break;
     case "Spine":
-      var q1 = new Quaternion(qR.x, qR.z, qR.y, qR.w);
+      var q1 = new Quaternion(qR.y, qR.z, qR.x, qR.w);
       var qC1 = getparentNodeQuaternion(obj.id);
       var qR1 = q1.mul(qC1);
       qR = JSON.parse(JSON.stringify(qR1));
-      x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
+      x.quaternion.set(qR.y, qR.z, qR.x, qR.w);
       setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
       break;
     case "RightArm":
