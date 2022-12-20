@@ -1,7 +1,7 @@
 function qte(q0,q1,q2,q3) {
-  const Rx = Math.atan2(2 * (q0 * q1 + q2 * q3), 1 - (2 * (q1 * q1 + q2 * q2)));
-  const Ry = Math.asin(2 * (q0 * q2 - q3 * q1));
-  const Rz = Math.atan2(2 * (q0 * q3 + q1 * q2), 1 - (2  * (q2 * q2 + q3 * q3)));
+  const Rx = Math.atan2((2 * q1 * q2) - (2 * q0 * q3), (2 * q0 * q0) + ((2 * q1 * q1) - 1))
+  const Ry = -Math.asin(((2 * q1 * q3) + (2 * q0 * q2))); 
+  const Rz = Math.atan2((2 * q2 * q3) - (2 * q0 * q1), (2 * q0 * q0) + ((2 * q3 * q3) - 1));
 
   const euler = {x:Rx, y:Ry, z:Rz};
 
@@ -39,24 +39,24 @@ function handleWSMessage(obj) {
   switch (bone) {
     case "Hips":
       var e = qte(qR.z, qR.y, qR.w, qR.x);
-         // console.log(e);
-      x.rotation.set(-e.x, e.y-Math.PI, -e.z);
-      setGlobal(obj.id, -e.x, e.y-Math.PI, -e.z);
+      x.rotation.set(e.z-Math.PI, e.y-Math.PI, e.x-Math.PI)
+      setGlobal(obj.id, -e.x, e.y, -e.z);
       break;
     case "Spine":
       var e = qte(qR.z, qR.y, qR.w, qR.x);
       var e1 = getParentNodeEuler(obj.id);
-      x.rotation.set(-e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
+          console.log(e, e1.y);
+      x.rotation.set(-e.x-e1.x, -e.y+e1.y, e.z-e1.z);
+      setGlobal(obj.id, -e.x-e1.x, Math.PI + e.y-e1.y, e.z-e1.z);
+      break;
+          /*
+    case "RightArm":
+      var e = qte(qR.z, qR.y, qR.w, qR.x);
+      var e1 = getParentNodeEuler(obj.id);
+      x.rotation.set(-e.x, Math.PI - e.y, -e.z);
       setGlobal(obj.id, -e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
-    case "RightArm":
-      var q1 = new Quaternion(qR.y, qR.x, -qR.z, qR.w);
-      var qC1 = getParentNodeEuler(obj.id);
-      var qR1 = q1.mul(qC1);
-      qR = JSON.parse(JSON.stringify(qR1));
-      x.quaternion.set(qR.y, qR.x, -qR.z, qR.w);
-      setGlobal(obj.id, qR.y, qR.x, -qR.z, qR.w);
-      break;
+      */
     default:
       x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
       break;
