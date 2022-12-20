@@ -52,7 +52,7 @@ function handleWSMessage(obj) {
           e.y = e.y - e1.y;
           e.z = e.z - e1.z;
           */
-      x.rotation.set(-e.x, e.y-Math.PI, e.z);
+      x.rotation.set(-e.x- e1.x, Math.PI - e.y + e1.y, e.z- e1.z);
       setGlobal(obj.id, -e.x, Math.PI-e.y, e.z);
       break;
     case "RightArm":
