@@ -39,21 +39,15 @@ function handleWSMessage(obj) {
   switch (bone) {
     case "Hips":
       var e = qte(qR.z, qR.y, qR.w, qR.x);
-          console.log(e);
+         // console.log(e);
       x.rotation.set(-e.x, e.y-Math.PI, -e.z);
       setGlobal(obj.id, -e.x, e.y-Math.PI, -e.z);
       break;
     case "Spine":
       var e = qte(qR.z, qR.y, qR.w, qR.x);
       var e1 = getParentNodeEuler(obj.id);
-          console.log(e1);
-          /*
-          e.x = e.x - e1.x;
-          e.y = e.y - e1.y;
-          e.z = e.z - e1.z;
-          */
-      x.rotation.set(-e.x- e1.x, Math.PI - e.y + e1.y, e.z- e1.z);
-      setGlobal(obj.id, -e.x, Math.PI-e.y, e.z);
+      x.rotation.set(-e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
+      setGlobal(obj.id, -e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
     case "RightArm":
       var q1 = new Quaternion(qR.y, qR.x, -qR.z, qR.w);
