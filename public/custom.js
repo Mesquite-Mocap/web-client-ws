@@ -38,22 +38,26 @@ function handleWSMessage(obj) {
 
   switch (bone) {
     case "Hips":
-        var e = qte(qR.z, qR.y, qR.w, qR.x);
-      x.rotation.set(e.x, Math.PI-e.y, e.z);
-     // x.quaternion.set(qR.x, qR.z, qR.y, qR.w);
-      setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
+      var e = qte(qR.z, qR.y, qR.w, qR.x);
+          console.log(e);
+      x.rotation.set(-e.x, e.y-Math.PI, -e.z);
+      setGlobal(obj.id, -e.x, e.y-Math.PI, -e.z);
       break;
     case "Spine":
-      var q1 = new Quaternion(qR.y, qR.z, qR.x, qR.w);
-      var qC1 = getparentNodeQuaternion(obj.id);
-      var qR1 = q1.mul(qC1);
-      qR = JSON.parse(JSON.stringify(qR1));
-      x.quaternion.set(qR.y, qR.z, qR.x, qR.w);
-      setGlobal(obj.id, qR.x, qR.z, qR.y, qR.w);
+      var e = qte(qR.z, qR.y, qR.w, qR.x);
+      var e1 = getParentNodeEuler(obj.id);
+          console.log(e1);
+          /*
+          e.x = e.x - e1.x;
+          e.y = e.y - e1.y;
+          e.z = e.z - e1.z;
+          */
+      x.rotation.set(-e.x, e.y-Math.PI, e.z);
+      setGlobal(obj.id, -e.x, Math.PI-e.y, e.z);
       break;
     case "RightArm":
       var q1 = new Quaternion(qR.y, qR.x, -qR.z, qR.w);
-      var qC1 = getparentNodeQuaternion(obj.id);
+      var qC1 = getParentNodeEuler(obj.id);
       var qR1 = q1.mul(qC1);
       qR = JSON.parse(JSON.stringify(qR1));
       x.quaternion.set(qR.y, qR.x, -qR.z, qR.w);
@@ -72,7 +76,7 @@ function setGlobal(id, x, y, z, w) {
   mac2Bones[id].global.w = w;
 }
 
-function getparentNodeQuaternion(child) {
+function getParentNodeEuler(child) {
   var id = dependencyGraph[[mac2Bones[child].id]];
   var keys = Object.keys(mac2Bones);
   for (var i = 0; i < keys.length; i++) {
@@ -80,12 +84,11 @@ function getparentNodeQuaternion(child) {
       if (mac2Bones[keys[i]].global.x == null) {
         return null;
       }
-      return new Quaternion(
-        mac2Bones[keys[i]].global.x,
-        mac2Bones[keys[i]].global.y,
-        mac2Bones[keys[i]].global.z,
-        mac2Bones[keys[i]].global.w
-      );
+      return {
+          x: mac2Bones[keys[i]].global.x,
+          y: mac2Bones[keys[i]].global.y,
+          z: mac2Bones[keys[i]].global.z,
+        }
     }
   }
   return null;
