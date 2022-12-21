@@ -30,7 +30,9 @@ var dependencyGraph = {
   "LeftForeArm" : "LeftArm",
   "RightForeArm": "RightArm",
   "LeftArm": "Spine",
-  "RightArm": "Hips",
+  "RightLeg": "Spine",
+  "LeftLeg": "Spine",
+  "RightArm": "Spine",
   "Head": "Spine",
   "Spine": "Hips",
 }

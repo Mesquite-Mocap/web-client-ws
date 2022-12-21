@@ -47,13 +47,22 @@ function handleWSMessage(obj) {
     case "Hips":
       var e = qte(qR);
       x.rotation.set(e.x, e.z, e.y);
+      setLocal(obj.id, e.x, e.z, e.y)
       setGlobal(obj.id, e.x, e.z, e.y)
       break;
     case "Spine":
       var e = qte(qR)
       var e1 = getParentNodeEuler(obj.id);
       x.rotation.set(e.x-e1.x, e.z-e1.y, e.y-e1.z);
-      setGlobal(obj.id, e.x-e1.x, e.z-e1.y, e.y-e1.z);
+      setGlobal(obj.id, e.x, e.z, e.y);
+      setLocal(obj.id, e.x-e1.x, e.z-e1.y, e.y-e1.z);
+      break;
+    case "RightLeg":
+      var e = qte(qR)
+      var e1 = getParentNodeEuler(obj.id);
+      x.rotation.set(e.x-e1.x, e.z-e1.y, e.y-e1.z);
+      setGlobal(obj.id, e.x, e.z, e.y);
+      setLocal(obj.id, e.x-e1.x, e.z-e1.y, e.y-e1.z);
       break;
     case "RightArm":
       var e = qte(qR)
@@ -69,11 +78,16 @@ function handleWSMessage(obj) {
   }
 }
 
-function setGlobal(id, x, y, z, w) {
+function setGlobal(id, x, y, z) {
   mac2Bones[id].global.x = x;
   mac2Bones[id].global.y = y;
   mac2Bones[id].global.z = z;
-  mac2Bones[id].global.w = w;
+}
+
+function setLocal(id, x, y, z) {
+  mac2Bones[id].local.x = x;
+  mac2Bones[id].local.y = y;
+  mac2Bones[id].local.z = z;
 }
 
 function getParentNodeEuler(child) {
