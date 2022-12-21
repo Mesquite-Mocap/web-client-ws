@@ -1,12 +1,30 @@
-function qte(q0,q1,q2,q3) {
-  const Rx = Math.atan2((2 * q1 * q2) - (2 * q0 * q3), (2 * q0 * q0) + ((2 * q1 * q1) - 1))
-  const Ry = -Math.asin(((2 * q1 * q3) + (2 * q0 * q2))); 
-  const Rz = Math.atan2((2 * q2 * q3) - (2 * q0 * q1), (2 * q0 * q0) + ((2 * q3 * q3) - 1));
+function qte(q) {
+     var angles = {};
+    var den = Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+    q.w /= den;
+    q.x /= den;
+    q.y /= den;
+    q.z /= den;
 
-  const euler = {x:Rx, y:Ry, z:Rz};
+    // roll (x-axis rotation)
+    var sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+    var cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+    angles.x = Math.atan2(sinr_cosp, cosr_cosp);
 
-  return(euler);
+    // pitch (y-axis rotation)
+    var sinp = Math.sqrt(1 + 2 * (q.w * q.x - q.y * q.z));
+    var cosp = Math.sqrt(1 - 2 * (q.w * q.x - q.y * q.z));
+    angles.y = 2 * Math.atan2(sinp, cosp) - Math.PI / 2;
+
+    // yaw (z-axis rotation)
+    var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+    var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+    angles.z = Math.atan2(siny_cosp, cosy_cosp);
+
+    return angles;
+
 }
+
 
 var rigPrefix = "mixamorig";
 
@@ -38,22 +56,20 @@ function handleWSMessage(obj) {
 
   switch (bone) {
     case "Hips":
-      var e = qte(qR.w, qR.x, qR.y, qR.z);
+      var e = qte(qR);
       x.rotation.set(-e.z, e.x, e.y);
       setGlobal(obj.id, -e.z, e.x, e.y)
       break;
     case "Spine":
-      var e = qte(qR.w, qR.x, qR.y, qR.z);
+      var e = qte(qR)
       var e1 = getParentNodeEuler(obj.id);
       x.rotation.set(Math.PI+e.z+e1.x, Math.PI+e.x-e1.y, e.y-Math.PI-e1.z)
       setGlobal(obj.id, Math.PI+e.z+e1.x, Math.PI+e.x-e1.y, e.y-Math.PI-e1.z)
       break;
     case "RightArm":
-      var e = qte(qR.w, qR.y, qR.x, qR.z);
+      var e = qte(qR)
       var e1 = getParentNodeEuler(obj.id);
-          console.log(e, e1)
-     // x.rotation.set(-e.y, 2*Math.PI-e.x, -e.z);
-      x.rotation.set(-e.y, 2*Math.PI-e.x, -e.z);
+      x.rotation.set(-e.y, 2*Math.PI-e.z, -e.x);
       setGlobal(obj.id, -e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
     default:
