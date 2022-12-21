@@ -46,16 +46,15 @@ function handleWSMessage(obj) {
       var e = qte(qR.w, qR.x, qR.y, qR.z);
       var e1 = getParentNodeEuler(obj.id);
       x.rotation.set(Math.PI+e.z+e1.x, Math.PI+e.x-e1.y, e.y-Math.PI-e1.z)
-      setGlobal(obj.id, -e.x-e1.x, Math.PI + e.y-e1.y, e.z-e1.z);
+      setGlobal(obj.id, Math.PI+e.z+e1.x, Math.PI+e.x-e1.y, e.y-Math.PI-e1.z)
       break;
-          /*
     case "RightArm":
       var e = qte(qR.z, qR.y, qR.w, qR.x);
       var e1 = getParentNodeEuler(obj.id);
-      x.rotation.set(-e.x, Math.PI - e.y, -e.z);
+      //x.rotation.set(-Math.PI-e.z, Math.PI+e.x, -e.y);
+      x.rotation.set(e.z-e1.x, e.x-e1.y, Math.PI+e.y-e1.z);
       setGlobal(obj.id, -e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
-      */
     default:
       x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
       break;
