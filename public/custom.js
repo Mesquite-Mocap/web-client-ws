@@ -49,10 +49,11 @@ function handleWSMessage(obj) {
       setGlobal(obj.id, Math.PI+e.z+e1.x, Math.PI+e.x-e1.y, e.y-Math.PI-e1.z)
       break;
     case "RightArm":
-      var e = qte(qR.z, qR.y, qR.w, qR.x);
+      var e = qte(qR.w, qR.y, qR.x, qR.z);
       var e1 = getParentNodeEuler(obj.id);
-      //x.rotation.set(-Math.PI-e.z, Math.PI+e.x, -e.y);
-      x.rotation.set(e.z-e1.x, e.x-e1.y, Math.PI+e.y-e1.z);
+          console.log(e, e1)
+     // x.rotation.set(-e.y, 2*Math.PI-e.x, -e.z);
+      x.rotation.set(-e.y, 2*Math.PI-e.x, -e.z);
       setGlobal(obj.id, -e.x-e1.x, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
     default:
