@@ -57,12 +57,14 @@ function handleWSMessage(obj) {
       setLocal(obj.id, e.x-e1.x, -e.z-e1.y, -e.y-e1.z);
       setGlobal(obj.id, e.x, -e.z, -e.y);
       break;
-    case "RightLeg":
+    case "RightUpLeg":
       var e = qte(qR)
       var e1 = getParentNodeEuler(obj.id);
-      x.rotation.set(e.x-e1.x, e.z-e1.y, e.y-e1.z);
-      setLocal(obj.id, e.x-e1.x, e.z-e1.y, e.y-e1.z);
-      setGlobal(obj.id, e.x, e.z, e.y);
+      //x.rotation.set(e.x, -e.z, -e.y);
+     x.rotation.set(e.x-e1.x, -e.z-e1.y, -e.y-e1.z);
+
+      setLocal(obj.id, e.x, -e.z, -e.y)
+      setGlobal(obj.id, e.x-e1.x, -e.z-e1.y, -e.y-e1.z);
       break;
     case "RightArm":
       var e = qte(qR)
@@ -71,19 +73,11 @@ function handleWSMessage(obj) {
           console.log(180 * e1.x / Math.PI, 180 * e1.y / Math.PI, 180 * e1.z / Math.PI);
      // x.rotation.set(e.x, -e.y, e.z);
           var fy, fx, fz;
-          fx = e.x;
-          fy = -e.y;
-          fz = e.z;
-          if(e.y < 0) {
-              console.log("here");
-              fy =  -(e.y + e1.y) - Math.PI;
-          }
-          else {
-              console.log("here too");
-              fy = -(e.y + e1.y);
-          }
+          fx = e.x -e1.x;
+          fy = -e.y +e1.y;
+          fz = e.z + e1.z;
       x.rotation.set(fx, fy, fz);
-      console.log(e.x, -2*Math.PI+(-e.y+e1.y), e.z);
+      console.log(180 * fx / Math.PI, 180 * fy / Math.PI, 180 * fz / Math.PI);
           console.log("......")
       setGlobal(obj.id, -e.x-e1.y, 2*Math.PI + e.y-e1.y, e.z-e1.z);
       break;
