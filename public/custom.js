@@ -46,16 +46,16 @@ function handleWSMessage(obj) {
   switch (bone) {
     case "Hips":
       var e = qte(qR);
-      x.rotation.set(e.x, -e.z, e.y);
-      setLocal(obj.id, e.x, -e.z, e.y)
-      setGlobal(obj.id, e.x, -e.z, e.y)
+      x.rotation.set(e.x, -e.z, -e.y);
+      setLocal(obj.id, e.x, -e.z, -e.y)
+      setGlobal(obj.id, e.x, -e.z, -e.y)
       break;
     case "Spine":
       var e = qte(qR)
       var e1 = getParentNodeEuler(obj.id);
-      x.rotation.set(e.x-e1.x, -e.z-e1.y, e.y-e1.z);
-      setLocal(obj.id, e.x-e1.x, -e.z-e1.y, e.y-e1.z);
-      setGlobal(obj.id, e.x, -e.z, e.y);
+      x.rotation.set(e.x-e1.x, -e.z-e1.y, -e.y-e1.z);
+      setLocal(obj.id, e.x-e1.x, -e.z-e1.y, -e.y-e1.z);
+      setGlobal(obj.id, e.x, -e.z, -e.y);
       break;
     case "RightLeg":
       var e = qte(qR)
