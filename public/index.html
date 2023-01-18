@@ -10,6 +10,8 @@
     <script src="mappings.js"></script>
     <script src="custom.js"></script>
     <script src="quaternion.min.js"></script>
+    <script src="three.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/kalmanjs@1.1.0/lib/kalman.js"></script> -->
   </head>
 
   <body>
@@ -70,7 +72,9 @@
             try {
               var obj = JSON.parse(text);
               handleWSMessage(obj);
-            } catch (e) {}
+            } catch (e) {
+              console.log(e);
+            }
           });
         };
 
@@ -139,6 +143,9 @@
         const grid = new THREE.GridHelper(2000, 20, 0x000000, 0x000000);
         grid.material.opacity = 0.2;
         grid.material.transparent = true;
+
+        const axesHelper = new THREE.AxesHelper( 5 );
+        scene.add( axesHelper );
         //			scene.add( grid );
 
         // model
