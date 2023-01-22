@@ -23,103 +23,74 @@ function calibrate() {
     mac2Bones[keys[i]].calibration.y = mac2Bones[keys[i]].last.y;
     mac2Bones[keys[i]].calibration.z = mac2Bones[keys[i]].last.z;
     mac2Bones[keys[i]].calibration.w = mac2Bones[keys[i]].last.w;
-
-    // var bone = mac2Bones[keys[i]].id;
-    // var x = model.getObjectByName(rigPrefix + bone);
-    // console.log(x.getWorldQuaternion());
-    // mac2Bones[keys[i]].sensorPosition = x.getWorldQuaternion();
-
   }
 }
 
 var dist = 0;
-gravity = [0, 0, 0]
-alpha = 0.8
-velocityX = 0
-velocityY = 0
-velocityZ = 0
+var gravity = [0, 0, 0]
+var alpha = 0.8
+var velocityX = 0
+var velocityY = 0
+var velocityZ = 0
 
 function handleWSMessage(obj) {
-  console.log(mac2Bones[obj.id].id);
+  // console.log(mac2Bones[obj.id].id);
   mac2Bones[obj.id].last.x = obj.x;
   mac2Bones[obj.id].last.y = obj.y;
   mac2Bones[obj.id].last.z = obj.z;
   mac2Bones[obj.id].last.w = obj.w;
   var bone = mac2Bones[obj.id].id;
   var x = model.getObjectByName(rigPrefix + bone);
-  var q = new Quaternion(obj.x, obj.y, obj.z, obj.w);
+  var q = new Quaternion(obj.w, obj.x, obj.y, obj.z);
   var qC = new Quaternion(
+    mac2Bones[obj.id].calibration.w,
     mac2Bones[obj.id].calibration.x,
     mac2Bones[obj.id].calibration.y,
-    mac2Bones[obj.id].calibration.z,
-    mac2Bones[obj.id].calibration.w
+    mac2Bones[obj.id].calibration.z
+    // mac2Bones[obj.id].calibration.w
   );
-  // var qD = new THREE.Quaternion(
-  //   mac2Bones[obj.id].sensorPosition.x,
-  //   mac2Bones[obj.id].sensorPosition.y,
-  //   mac2Bones[obj.id].sensorPosition.z,
-  //   mac2Bones[obj.id].sensorPosition.w
-  // );
-
-  // var qD = new Quaternion(0, 0, 0, 1);
 
   var qR = q.mul(qC.inverse());
-  // console.log(qD);
-
-  // const interQuat = new THREE.Quaternion();
-  // THREE.Quaternion.slerp(qC, mac2Bones[obj.id].sensorPosition, interQuat, 0.5);
-  //
-  // // console.log(interQuat);
-  //
-  // var aligned = interQuat.multiply(q);
-  //
-  // console.log(aligned);
-
-  // if(isNaN(qR)) {
-    // qR = aligned;
-  // }
 
   var e = qte(qR)
   var e1 = getParentQuat(obj.id);
 
-  if (mac2Bones[obj.id].id = "Hips"){
+  if (mac2Bones[obj.id].id == "Hips") {
 
-  var aX = obj.accX
-  var aY = obj.accY
-  var aZ = obj.accZ
+    var aX = obj.accX
+    var aY = obj.accY
+    var aZ = obj.accZ
 
-  gravity[0] = alpha * gravity[0] + (1- alpha) * aX
-  gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
-  gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
+    gravity[0] = alpha * gravity[0] + (1 - alpha) * aX
+    gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
+    gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
 
-  linear_aX = aX - gravity[0]
-  linear_aY = aY - gravity[1]
-  linear_aZ = aX - gravity[2]
+    linear_aX = (aX - gravity[0]).toFixed(2)
+    linear_aY = (aY - gravity[1]).toFixed(2)
+    linear_aZ = (aZ - gravity[2]).toFixed(2)
 
-  distX = velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05
-  distY = velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05
-  distZ = velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05
+    distX = (velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05).toFixed(2)
+    distY = (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05).toFixed(2)
+    distZ = (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05).toFixed(2)
 
-  velocityX = velocityX + linear_aX * 0.05
-  velocityY = velocityY + linear_aY * 0.05
-  velocityZ = velocityZ + linear_aZ * 0.05
+    velocityX = velocityX + linear_aX * 0.05
+    velocityY = velocityY + linear_aY * 0.05
+    velocityZ = velocityZ + linear_aZ * 0.05
 
-    console.log(linear_aX, linear_aY, linear_aZ)
-
+    // console.log(linear_aX, linear_aY, linear_aZ)
+    // console.log(linear_aX, linear_aY, linear_aZ)
+    console.log(distX, distY, distZ)
+    if(linear_aX > 0.1 || linear_aY > 0.1 || linear_aZ > 0.1 || linear_aX < -0.1 || linear_aY < -0.1 || linear_aZ < -0.1) {
+      x.translateX(distX);
+      x.translateY(distZ);
+      x.translateZ(-distY);
+    }
   }
-  // acc = Math.sqrt(ax**2+ay**2+az**2) - 9.81
-  // dist += acc*0.05*0.05
-  // console.log(dist)
-  // console.log(ax, ay, az)
-
-  // let velocity = new THREE.Vector3()
-  // const acceleration = new THREE.Vector3(aX, aY, aZ)
-  // x.position.add(velocity.clone().multiplyScalar(0.5)).add(acceleration.clone().multiplyScalar(0.5 * 0.5 ** 2))
-
 
   if(e1 == null) {
+
     // x.rotation.set(e.z, e.x, -e.y);
-    x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
+    x.quaternion.set(qR.x, qR.z, -qR.y, qR.w);
     setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   } else {
@@ -135,7 +106,7 @@ function handleWSMessage(obj) {
     var qR1 = qR.mul(e1q.inverse());
     // console.log("e1q", qR1.x,qR1.y, qR1.z,qR1.w);
 
-    x.quaternion.set(qR1.z, qR1.x, -qR1.y, qR1.w);
+    x.quaternion.set(qR1.x, qR1.z, -qR1.y, qR1.w);
     setLocal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   }
