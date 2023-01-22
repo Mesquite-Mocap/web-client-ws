@@ -33,6 +33,11 @@ function calibrate() {
 }
 
 var dist = 0;
+gravity = [0, 0, 0]
+alpha = 0.8
+velocityX = 0
+velocityY = 0
+velocityZ = 0
 
 function handleWSMessage(obj) {
   console.log(mac2Bones[obj.id].id);
@@ -77,9 +82,31 @@ function handleWSMessage(obj) {
   var e = qte(qR)
   var e1 = getParentQuat(obj.id);
 
+  if (mac2Bones[obj.id].id = "Hips"){
+
   var aX = obj.accX
   var aY = obj.accY
   var aZ = obj.accZ
+
+  gravity[0] = alpha * gravity[0] + (1- alpha) * aX
+  gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
+  gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
+
+  linear_aX = aX - gravity[0]
+  linear_aY = aY - gravity[1]
+  linear_aZ = aX - gravity[2]
+
+  distX = velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05
+  distY = velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05
+  distZ = velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05
+
+  velocityX = velocityX + linear_aX * 0.05
+  velocityY = velocityY + linear_aY * 0.05
+  velocityZ = velocityZ + linear_aZ * 0.05
+
+    console.log(linear_aX, linear_aY, linear_aZ)
+
+  }
   // acc = Math.sqrt(ax**2+ay**2+az**2) - 9.81
   // dist += acc*0.05*0.05
   // console.log(dist)
