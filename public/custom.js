@@ -32,8 +32,10 @@ function calibrate() {
   }
 }
 
+var dist = 0;
+
 function handleWSMessage(obj) {
-  // console.log(obj.id);
+  console.log(mac2Bones[obj.id].id);
   mac2Bones[obj.id].last.x = obj.x;
   mac2Bones[obj.id].last.y = obj.y;
   mac2Bones[obj.id].last.z = obj.z;
@@ -54,7 +56,7 @@ function handleWSMessage(obj) {
   //   mac2Bones[obj.id].sensorPosition.w
   // );
 
-  var qD = new Quaternion(0, 0, 0, 1);
+  // var qD = new Quaternion(0, 0, 0, 1);
 
   var qR = q.mul(qC.inverse());
   // console.log(qD);
@@ -74,6 +76,19 @@ function handleWSMessage(obj) {
 
   var e = qte(qR)
   var e1 = getParentQuat(obj.id);
+
+  var aX = obj.accX
+  var aY = obj.accY
+  var aZ = obj.accZ
+  // acc = Math.sqrt(ax**2+ay**2+az**2) - 9.81
+  // dist += acc*0.05*0.05
+  // console.log(dist)
+  // console.log(ax, ay, az)
+
+  // let velocity = new THREE.Vector3()
+  // const acceleration = new THREE.Vector3(aX, aY, aZ)
+  // x.position.add(velocity.clone().multiplyScalar(0.5)).add(acceleration.clone().multiplyScalar(0.5 * 0.5 ** 2))
+
 
   if(e1 == null) {
     // x.rotation.set(e.z, e.x, -e.y);
