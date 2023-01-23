@@ -41,13 +41,12 @@ function handleWSMessage(obj) {
   mac2Bones[obj.id].last.w = obj.w;
   var bone = mac2Bones[obj.id].id;
   var x = model.getObjectByName(rigPrefix + bone);
-  var q = new Quaternion(obj.w, obj.x, obj.y, obj.z);
+  var q = new Quaternion(obj.x, obj.y, obj.z, obj.w);
   var qC = new Quaternion(
-    mac2Bones[obj.id].calibration.w,
     mac2Bones[obj.id].calibration.x,
     mac2Bones[obj.id].calibration.y,
-    mac2Bones[obj.id].calibration.z
-    // mac2Bones[obj.id].calibration.w
+    mac2Bones[obj.id].calibration.z,
+    mac2Bones[obj.id].calibration.w
   );
 
   var qR = q.mul(qC.inverse());
@@ -79,18 +78,17 @@ function handleWSMessage(obj) {
 
     // console.log(linear_aX, linear_aY, linear_aZ)
     // console.log(linear_aX, linear_aY, linear_aZ)
-    console.log(distX, distY, distZ)
-    if(linear_aX > 0.1 || linear_aY > 0.1 || linear_aZ > 0.1 || linear_aX < -0.1 || linear_aY < -0.1 || linear_aZ < -0.1) {
-      x.translateX(distX);
-      x.translateY(distZ);
-      x.translateZ(-distY);
-    }
+    // console.log(distX, distY, distZ)
+    // if(linear_aX > 0.1 || linear_aY > 0.1 || linear_aZ > 0.1 || linear_aX < -0.1 || linear_aY < -0.1 || linear_aZ < -0.1) {
+    //   x.translateX(distX);
+    //   x.translateY(distZ);
+    //   x.translateZ(-distY);
+    // }
   }
 
   if(e1 == null) {
-
-    // x.rotation.set(e.z, e.x, -e.y);
-    x.quaternion.set(qR.x, qR.z, -qR.y, qR.w);
+    // console.log("e", qR.x, qR.y , qR.z ,qR.w);
+    x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
     setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   } else {
@@ -106,7 +104,7 @@ function handleWSMessage(obj) {
     var qR1 = qR.mul(e1q.inverse());
     // console.log("e1q", qR1.x,qR1.y, qR1.z,qR1.w);
 
-    x.quaternion.set(qR1.x, qR1.z, -qR1.y, qR1.w);
+    x.quaternion.set(qR1.z, qR1.x, -qR1.y, qR1.w);
     setLocal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   }
