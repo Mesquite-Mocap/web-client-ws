@@ -1,5 +1,5 @@
 function qte(q) {
-     var angles = {};
+    var angles = {};
     var den = Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
     q.w /= den;
     q.x /= den;
@@ -55,6 +55,15 @@ function handleWSMessage(obj) {
   var e1 = getParentQuat(obj.id);
 
   if (mac2Bones[obj.id].id == "Hips") {
+
+    madgwickAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
+                    obj.accY, obj.accZ, obj.magX, obj.magY, obj.magZ)
+    var R = quatern2rotMat([q0, q1, q2, q3])
+    var tcAcc = numeric.dot(R, [obj.accX, obj.accY, obj.accZ])
+    tcAcc[2] = tcAcc[2] - 9.81
+    // tcAcc = tcAcc.map((val) => val * 9.81);
+
+    console.log(tcAcc)
 
     var aX = obj.accX
     var aY = obj.accY
@@ -218,4 +227,18 @@ function getParentQuat(child) {
     }
   }
   return null;
+}
+
+function quatern2rotMat(q) {
+  var R = [[], [], []];
+  R[0][0] = 2 * Math.pow(q[0], 2) - 1 + 2 * Math.pow(q[1], 2);
+  R[0][1] = 2 * (q[1] * q[2] + q[0] * q[3]);
+  R[0][2] = 2 * (q[1] * q[3] - q[0] * q[2]);
+  R[1][0] = 2 * (q[1] * q[2] - q[0] * q[3]);
+  R[1][1] = 2 * Math.pow(q[0], 2) - 1 + 2 * Math.pow(q[2], 2);
+  R[1][2] = 2 * (q[2] * q[3] + q[0] * q[1]);
+  R[2][0] = 2 * (q[1] * q[3] + q[0] * q[2]);
+  R[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
+  R[2][2] = 2 * Math.pow(q[0], 2) - 1 + 2 * Math.pow(q[3], 2);
+  return R;
 }
