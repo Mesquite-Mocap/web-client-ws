@@ -32,6 +32,10 @@ var alpha = 0.8
 var velocityX = 0
 var velocityY = 0
 var velocityZ = 0
+var distX = 0
+var distY = 0
+var distZ = 0
+
 
 function handleWSMessage(obj) {
   // console.log(mac2Bones[obj.id].id);
@@ -69,6 +73,9 @@ function handleWSMessage(obj) {
     var aY = obj.accY
     var aZ = obj.accZ
 
+    
+
+
     gravity[0] = alpha * gravity[0] + (1 - alpha) * aX
     gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
     gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
@@ -77,13 +84,17 @@ function handleWSMessage(obj) {
     linear_aY = (aY - gravity[1]).toFixed(2)
     linear_aZ = (aZ - gravity[2]).toFixed(2)
 
-    distX = (velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05).toFixed(2)
-    distY = (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05).toFixed(2)
-    distZ = (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05).toFixed(2)
+    // distX = (velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05).toFixed(2)
+    // distY = (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05).toFixed(2)
+    // distZ = (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05).toFixed(2)
 
     velocityX = velocityX + linear_aX * 0.05
     velocityY = velocityY + linear_aY * 0.05
     velocityZ = velocityZ + linear_aZ * 0.05
+    
+    distX = distX + 0.5 * linear_aX * 0.05 * 0.05
+    distY = distY + 0.5 * linear_aY * 0.05 * 0.05
+    distZ = distZ + 0.5 * linear_aZ * 0.05 * 0.05
 
     // console.log(linear_aX, linear_aY, linear_aZ)
     // console.log(linear_aX, linear_aY, linear_aZ)
@@ -195,6 +206,9 @@ function handleWSMessage(obj) {
   //     break;
   // }
 }
+
+
+
 
 function setGlobal(id, x, y, z, w) {
   mac2Bones[id].global.x = x;
