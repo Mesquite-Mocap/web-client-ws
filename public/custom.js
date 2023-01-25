@@ -28,10 +28,15 @@ function calibrate() {
 
 var dist = 0;
 var gravity = [0, 0, 0]
-var alpha = 0.8
+var alpha = 0.7
 var velocityX = 0
 var velocityY = 0
 var velocityZ = 0
+var distX = 0
+var distY = 0
+var distZ = 0
+
+const freq = 0.1
 
 function handleWSMessage(obj) {
   // console.log(mac2Bones[obj.id].id);
@@ -55,15 +60,18 @@ function handleWSMessage(obj) {
   var e1 = getParentQuat(obj.id);
 
   if (mac2Bones[obj.id].id == "Hips") {
-
-    madgwickAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
+    mahonyAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
                     obj.accY, obj.accZ, obj.magX, obj.magY, obj.magZ)
+
+    // mahonyAHRSupdateIMU(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
+    //                 obj.accY, obj.accZ)
+    // // madgwickAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
+    // //                 obj.accY, obj.accZ, obj.magX, obj.magY, obj.magZ)
     var R = quatern2rotMat([q0, q1, q2, q3])
     var tcAcc = numeric.dot(R, [obj.accX, obj.accY, obj.accZ])
     tcAcc[2] = tcAcc[2] - 9.81
-    // tcAcc = tcAcc.map((val) => val * 9.81);
 
-    console.log(tcAcc)
+    // console.log("1", tcAcc)
 
     var aX = obj.accX
     var aY = obj.accY
@@ -77,21 +85,65 @@ function handleWSMessage(obj) {
     linear_aY = (aY - gravity[1]).toFixed(2)
     linear_aZ = (aZ - gravity[2]).toFixed(2)
 
-    distX = (velocityX * (0.05) + (0.5) * linear_aX * 0.05 * 0.05).toFixed(2)
-    distY = (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05).toFixed(2)
-    distZ = (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05).toFixed(2)
+    if(linear_aX < 0.5 && linear_aX > -0.5) {
+      linear_aX = 0
+    }
 
-    velocityX = velocityX + linear_aX * 0.05
-    velocityY = velocityY + linear_aY * 0.05
-    velocityZ = velocityZ + linear_aZ * 0.05
+    if(linear_aY < 0.5 && linear_aY > -0.5) {
+      linear_aY = 0
+    }
+
+    if(linear_aZ < 0.5 && linear_aZ > -0.5) {
+      linear_aZ = 0
+    }
+    // console.log([linear_aX, linear_aY, linear_aZ])
+
+    velocityX = velocityX + linear_aX * freq
+    velocityY = velocityY + linear_aY * freq
+    velocityZ = velocityZ + linear_aZ * freq
+
+    if(velocityX < 0.5 && velocityX > -0.5) {
+      velocityX = 0
+    }
+
+    if(velocityY < 0.5 && velocityY > -0.5) {
+      velocityY = 0
+    }
+
+    if(velocityZ < 0.5 && velocityZ > -0.5) {
+      velocityZ = 0
+    }
+
+    var movX = getMovementValue(velocityX, linear_aX)
+    if(movX > 0.06 || movX < -0.06) {
+      distX = distX + movX*100
+    }
+
+    var movY = getMovementValue(velocityY, linear_aY)
+    if(movY > 0.06 || movY < -0.06) {
+      distY = distY + movY*100
+    }
+
+    var movZ = getMovementValue(velocityZ, linear_aZ)
+    if(movZ > 0.06 || movZ < -0.06) {
+      distZ = distZ + movZ*100
+    }
+
+    console.log([movX*100, movY*100, movZ*100])
+
+    // x.position.set(distX, distY, distZ)
+
+    // distY = distY + (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05)
+    // distZ = distZ + (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05)
+    // console.log([distX, distY, distZ])
 
     // console.log(linear_aX, linear_aY, linear_aZ)
     // console.log(linear_aX, linear_aY, linear_aZ)
     // console.log(distX, distY, distZ)
     // if(linear_aX > 0.1 || linear_aY > 0.1 || linear_aZ > 0.1 || linear_aX < -0.1 || linear_aY < -0.1 || linear_aZ < -0.1) {
-    //   x.translateX(distX);
-    //   x.translateY(distZ);
-    //   x.translateZ(-distY);
+      x.translateX(movX*10);
+      x.translateY(movZ*10);
+      x.translateZ(-movY*10);
     // }
   }
 
@@ -241,4 +293,9 @@ function quatern2rotMat(q) {
   R[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
   R[2][2] = 2 * Math.pow(q[0], 2) - 1 + 2 * Math.pow(q[3], 2);
   return R;
+}
+
+function getMovementValue(a, b) {
+  // return (a * freq + (0.5) * b * freq * freq)
+  return a*freq;
 }
