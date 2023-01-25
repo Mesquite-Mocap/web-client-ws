@@ -92,9 +92,9 @@ function handleWSMessage(obj) {
     velocityY = velocityY + linear_aY * 0.05
     velocityZ = velocityZ + linear_aZ * 0.05
     
-    distX = distX + 0.5 * linear_aX * 0.05 * 0.05
-    distY = distY + 0.5 * linear_aY * 0.05 * 0.05
-    distZ = distZ + 0.5 * linear_aZ * 0.05 * 0.05
+    distX = distX + velocityX * 0.05
+    distY = distY + velocityY * 0.05
+    distZ = distZ +  velocityZ * 0.05
 
     // console.log(linear_aX, linear_aY, linear_aZ)
     // console.log(linear_aX, linear_aY, linear_aZ)
