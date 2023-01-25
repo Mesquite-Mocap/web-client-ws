@@ -77,6 +77,9 @@ function handleWSMessage(obj) {
     var aY = obj.accY
     var aZ = obj.accZ
 
+
+
+
     gravity[0] = alpha * gravity[0] + (1 - alpha) * aX
     gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
     gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
@@ -247,6 +250,9 @@ function handleWSMessage(obj) {
   //     break;
   // }
 }
+
+
+
 
 function setGlobal(id, x, y, z, w) {
   mac2Bones[id].global.x = x;
