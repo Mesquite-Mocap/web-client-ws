@@ -4,6 +4,7 @@ var dist = [0, 0, 0]
 var mov = []
 const freq = 0.015
 var counter=0
+var u = [0,0,0]
 
 function calibrate() {
   var keys = Object.keys(mac2Bones);
@@ -80,38 +81,52 @@ function handleWSMessage(obj) {
 
     if(obj.movement) {
       var velocity = [0, 0, 0, 0]
-      velocity[0] = velocity[0] + obj.accX * freq;
-      velocity[1] = velocity[1] + obj.accY * freq;
-      velocity[2] = velocity[2] + obj.accZ * freq;
+
+      velocity[0] = u[0] + obj.accX * freq;
+      velocity[1] = u[1] + obj.accY * freq;
+      velocity[2] = u[2] + obj.accZ * freq;
       velocity[3] = counter;
+      u[0] = velocity[0]
+      u[1] = velocity[1]
+      u[2] = velocity[2]
       counter += 1
       velocityArray.push(velocity)
+      // console.log(velocity)
+      
 
-      if(velocityArray.length == 10) {
-        var last = velocityArray[velocityArray.length-1]
-        last[0] /= velocityArray.length
-        last[1] /= velocityArray.length
-        last[2] /= velocityArray.length
+      // if(velocityArray.length == 100) {
+      //   var last = velocityArray[velocityArray.length-1]
+      //   last[0] /= velocityArray.length
+      //   last[1] /= velocityArray.length
+      //   last[2] /= velocityArray.length
 
-        var dummy = velocityArray.shift()
-        dummy[0] = dummy[0] - dummy[3] * last[0]
-        dummy[1] = dummy[1] - dummy[3] * last[1]
-        dummy[2] = dummy[2] - dummy[3] * last[2]
+        
+        
+      //   var dummy = velocityArray.shift()
+     
+      //   dummy[0] = dummy[0] - dummy[3] * last[0]
+      //   dummy[1] = dummy[1] - dummy[3] * last[1]
+      //   dummy[2] = dummy[2] - dummy[3] * last[2]
 
-        // console.log(dummy)
+      //   // console.log(dummy)
 
-        var movX = dummy[0] * freq
-        var movY = dummy[1] * freq
-        var movZ = dummy[2] * freq
+      //   var movX = dummy[0] * freq
+      //   var movY = dummy[1] * freq
+      //   var movZ = dummy[2] * freq
 
-        console.log(movX, movY, movZ)
+      //   // console.log(movX, movY, movZ)
+      //   dist[0] += movX * 10
+      //   dist[1] += movY * 10
+      //   dist[2] += movZ * 10
+      //   console.log(dist)
 
-        x.translateX(movX*100)
-        x.translateY(-movZ*100)
-        x.translateZ(movY*100)
-      }
+      //   x.translateX(movX)
+      //   x.translateY(-movZ)
+      //   x.translateZ(movY)
+      // }
     } else {
       counter=0
+      u = [0, 0, 0]
       var locallength=velocityArray.length
       while(velocityArray.length>0) {
         var last = velocityArray[velocityArray.length-1]
@@ -119,22 +134,29 @@ function handleWSMessage(obj) {
         last[1] /= locallength
         last[2] /= locallength
 
-        var dummy = velocityArray.shift()
-        dummy[0] = dummy[0] - dummy[3] * last[0]
-        dummy[1] = dummy[1] - dummy[3] * last[1]
-        dummy[2] = dummy[2] - dummy[3] * last[2]
+        var Vel_drift = velocityArray.shift()
 
-        // console.log(dummy)
+        
+        Vel_drift[0] = Vel_drift[0] - Vel_drift[3] * last[0]
+        Vel_drift[1] = Vel_drift[1] - Vel_drift[3] * last[1]
+        Vel_drift[2] = Vel_drift[2] - Vel_drift[3] * last[2]
 
-        var movX = dummy[0] * freq
-        var movY = dummy[1] * freq
-        var movZ = dummy[2] * freq
+        // console.log(Vel_drift)
 
-        console.log(movX, movY, movZ)
+        var movX = Vel_drift[0] * freq
+        var movY = Vel_drift[1] * freq
+        var movZ = Vel_drift[2] * freq
 
-        x.translateX(movX*100)
-        x.translateY(-movZ*100)
-        x.translateZ(movY*100)
+        // console.log(movX, movY, movZ)
+        dist[0] += movX
+        dist[1] += movY
+        dist[2] += movZ
+
+        console.log(dist)
+
+        x.translateX(movX)
+        x.translateY(-movZ)
+        x.translateZ(movY)
       }
     }
     // x.translateX(-obj.disX*10);
