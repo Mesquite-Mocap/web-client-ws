@@ -1,20 +1,9 @@
-function qte(q) {
-    var angles = {};
-    var den = Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
-    q.w /= den;
-    q.x /= den;
-    q.y /= den;
-    q.z /= den;
-
-    angles.x = Math.atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
-    angles.y = Math.asin(2 * (q.w * q.y - q.z * q.x));
-    angles.z = Math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
-
-    return angles;
-}
-
-
 var rigPrefix = "mixamorig";
+var velocityArray = []
+var dist = [0, 0, 0]
+var mov = []
+const freq = 0.015
+var counter=0
 
 function calibrate() {
   var keys = Object.keys(mac2Bones);
@@ -25,18 +14,6 @@ function calibrate() {
     mac2Bones[keys[i]].calibration.w = mac2Bones[keys[i]].last.w;
   }
 }
-
-var dist = 0;
-var gravity = [0, 0, 0]
-var alpha = 0.7
-var velocityX = 0
-var velocityY = 0
-var velocityZ = 0
-var distX = 0
-var distY = 0
-var distZ = 0
-
-const freq = 0.1
 
 function handleWSMessage(obj) {
   // console.log(mac2Bones[obj.id].id);
@@ -60,105 +37,118 @@ function handleWSMessage(obj) {
   var e1 = getParentQuat(obj.id);
 
   if (mac2Bones[obj.id].id == "Hips") {
-    mahonyAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
-                    obj.accY, obj.accZ, obj.magX, obj.magY, obj.magZ)
-
-    // mahonyAHRSupdateIMU(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
-    //                 obj.accY, obj.accZ)
-    // // madgwickAHRSupdate(obj.gyroX * (Math.PI/180), obj.gyroY * (Math.PI/180), obj.gyroZ * (Math.PI/180), obj.accX,
-    // //                 obj.accY, obj.accZ, obj.magX, obj.magY, obj.magZ)
-    var R = quatern2rotMat([q0, q1, q2, q3])
-    var tcAcc = numeric.dot(R, [obj.accX, obj.accY, obj.accZ])
-    tcAcc[2] = tcAcc[2] - 9.81
-
-    // console.log("1", tcAcc)
-
-    var aX = obj.accX
-    var aY = obj.accY
-    var aZ = obj.accZ
-
-
-
-
-    gravity[0] = alpha * gravity[0] + (1 - alpha) * aX
-    gravity[1] = alpha * gravity[1] + (1 - alpha) * aY
-    gravity[2] = alpha * gravity[2] + (1 - alpha) * aZ
-
-    linear_aX = (aX - gravity[0]).toFixed(2)
-    linear_aY = (aY - gravity[1]).toFixed(2)
-    linear_aZ = (aZ - gravity[2]).toFixed(2)
-
-    if(linear_aX < 0.5 && linear_aX > -0.5) {
-      linear_aX = 0
-    }
-
-    if(linear_aY < 0.5 && linear_aY > -0.5) {
-      linear_aY = 0
-    }
-
-    if(linear_aZ < 0.5 && linear_aZ > -0.5) {
-      linear_aZ = 0
-    }
-    // console.log([linear_aX, linear_aY, linear_aZ])
-
-    velocityX = velocityX + linear_aX * freq
-    velocityY = velocityY + linear_aY * freq
-    velocityZ = velocityZ + linear_aZ * freq
-
-    if(velocityX < 0.5 && velocityX > -0.5) {
-      velocityX = 0
-    }
-
-    if(velocityY < 0.5 && velocityY > -0.5) {
-      velocityY = 0
-    }
-
-    if(velocityZ < 0.5 && velocityZ > -0.5) {
-      velocityZ = 0
-    }
-
-    var movX = getMovementValue(velocityX, linear_aX)
-    if(movX > 0.06 || movX < -0.06) {
-      distX = distX + movX*100
-    }
-
-    var movY = getMovementValue(velocityY, linear_aY)
-    if(movY > 0.06 || movY < -0.06) {
-      distY = distY + movY*100
-    }
-
-    var movZ = getMovementValue(velocityZ, linear_aZ)
-    if(movZ > 0.06 || movZ < -0.06) {
-      distZ = distZ + movZ*100
-    }
-
-    console.log([movX*100, movY*100, movZ*100])
-
-    // x.position.set(distX, distY, distZ)
-
-    // distY = distY + (velocityY * (0.05) + (0.5) * linear_aY * 0.05 * 0.05)
-    // distZ = distZ + (velocityZ * (0.05) + (0.5) * linear_aZ * 0.05 * 0.05)
-    // console.log([distX, distY, distZ])
+    // var R = quatern2rotMat([obj.w, obj.x, obj.y, obj.z])
+    // var linearAcc = numeric.dot([obj.accX, obj.accY, obj.accZ], R)
+    // linearAcc[2] = linearAcc[2] - 9.81
+    //
+    // linear_aX = linearAcc[0]
+    // linear_aY = linearAcc[1]
+    // linear_aZ = linearAcc[2]
 
     // console.log(linear_aX, linear_aY, linear_aZ)
-    // console.log(linear_aX, linear_aY, linear_aZ)
-    // console.log(distX, distY, distZ)
-    // if(linear_aX > 0.1 || linear_aY > 0.1 || linear_aZ > 0.1 || linear_aX < -0.1 || linear_aY < -0.1 || linear_aZ < -0.1) {
-      x.translateX(movX*10);
-      x.translateY(movZ*10);
-      x.translateZ(-movY*10);
+
+    // if(Math.sqrt(linear_aX*linear_aX+linear_aY*linear_aY+linear_aZ*linear_aZ)<2) {
+    //   linear_aX = 0
+    //   linear_aY = 0
+    //   linear_aZ = 0
+    //
+    //   velocity[0] = 0
+    //   velocity[1] = 0
+    //   velocity[2] = 0
     // }
+
+    // velocity[0] = velocity[0] + linear_aX * freq
+    // velocity[1] = velocity[1] + linear_aY * freq
+    // velocity[2] = velocity[2] + linear_aZ * freq
+    //
+    // var movX = velocity[0] * freq
+    // var movY = velocity[1] * freq
+    // var movZ = velocity[2] * freq
+    //
+    // dist[0] += movX*10
+    // dist[1] += movY*10
+    // dist[2] += movZ*10
+
+    // console.log("vel", velocity)
+    // console.log("dist" , dist)
+
+    // x.position.set(obj.disX, obj.disY, obj.disZ)
+
+    // console.log(obj.movement)
+
+
+
+    if(obj.movement) {
+      var velocity = [0, 0, 0, 0]
+      velocity[0] = velocity[0] + obj.accX * freq;
+      velocity[1] = velocity[1] + obj.accY * freq;
+      velocity[2] = velocity[2] + obj.accZ * freq;
+      velocity[3] = counter;
+      counter += 1
+      velocityArray.push(velocity)
+
+      if(velocityArray.length == 10) {
+        var last = velocityArray[velocityArray.length-1]
+        last[0] /= velocityArray.length
+        last[1] /= velocityArray.length
+        last[2] /= velocityArray.length
+
+        var dummy = velocityArray.shift()
+        dummy[0] = dummy[0] - dummy[3] * last[0]
+        dummy[1] = dummy[1] - dummy[3] * last[1]
+        dummy[2] = dummy[2] - dummy[3] * last[2]
+
+        // console.log(dummy)
+
+        var movX = dummy[0] * freq
+        var movY = dummy[1] * freq
+        var movZ = dummy[2] * freq
+
+        console.log(movX, movY, movZ)
+
+        x.translateX(movX*100)
+        x.translateY(-movZ*100)
+        x.translateZ(movY*100)
+      }
+    } else {
+      counter=0
+      var locallength=velocityArray.length
+      while(velocityArray.length>0) {
+        var last = velocityArray[velocityArray.length-1]
+        last[0] /= locallength
+        last[1] /= locallength
+        last[2] /= locallength
+
+        var dummy = velocityArray.shift()
+        dummy[0] = dummy[0] - dummy[3] * last[0]
+        dummy[1] = dummy[1] - dummy[3] * last[1]
+        dummy[2] = dummy[2] - dummy[3] * last[2]
+
+        // console.log(dummy)
+
+        var movX = dummy[0] * freq
+        var movY = dummy[1] * freq
+        var movZ = dummy[2] * freq
+
+        console.log(movX, movY, movZ)
+
+        x.translateX(movX*100)
+        x.translateY(-movZ*100)
+        x.translateZ(movY*100)
+      }
+    }
+    // x.translateX(-obj.disX*10);
+    // x.translateY(-obj.disZ*10);
+    // x.translateZ(-obj.disY*10);
   }
 
   if(e1 == null) {
-    // console.log("e", qR.x, qR.y , qR.z ,qR.w);
     x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
     setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   } else {
     // console.log("e", qR.x, qR.y , qR.z ,qR.w);
     // console.log("e1", e1.x,e1.y, e1.z,e1.w);
-    // x.rotation.set(e.z+e1.z, e.x-e1.y, -e.y+e1.x);
 
     var ep = qte(e1);
     // console.log("e " + 180 * e.x / Math.PI, 180 * e.y / Math.PI, 180 * e.z / Math.PI);
@@ -172,87 +162,22 @@ function handleWSMessage(obj) {
     setLocal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
   }
-
-  // switch (bone) {
-  //   case "Hips":
-  //     var e = qte(qR);
-  //     // console.log("e", 180 * e.x / Math.PI, 180 * e.y / Math.PI, 180 * e.z / Math.PI);
-  //     // x.rotation.set(e.z, e.x, -e.y);
-  //     x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
-  //     setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //     setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //     break;
-  //   case "Spine":
-  //     var e = qte(qR)
-  //     var e1 = getParentNodeEuler(obj.id);
-  //     console.log(e1)
-  //     if(e1 == null) {
-  //       // x.rotation.set(e.z, e.x, -e.y);
-  //       x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
-  //       setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //       setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //     } else {
-  //       console.log("e", qR.x, qR.y , qR.z ,qR.w);
-  //       console.log("e1", e1.x,e1.y, e1.z,e1.w);
-  //       // console.log(e.z-e1.z, e.x-e1.x, -e.y-e1.y);
-  //       // x.rotation.set(e.z+e1.z, e.x-e1.y, -e.y+e1.x);
-  //
-  //       var e1q = new Quaternion(e1.w,e1.x, e1.y, e1.z);
-  //
-  //       var qR1 = qR.mul(e1q.inverse());
-  //       console.log("e1q", qR1.x,qR1.y, qR1.z,qR1.w);
-  //       x.quaternion.set(qR1.z, qR1.x, -qR1.y, qR1.w);
-  //       setLocal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
-  //       setGlobal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
-  //     }
-  //     break;
-  //   case "RightUpLeg":
-  //     var e = qte(qR)
-  //     var e1 = getParentNodeEuler(obj.id);
-  //     console.log(e1)
-  //     if(e1 == null) {
-  //       // x.rotation.set(e.z, e.x, -e.y);
-  //       x.quaternion.set(qR.z, qR.x, -qR.y, qR.w);
-  //       setLocal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //       setGlobal(obj.id, qR.x, qR.y, qR.z, qR.w)
-  //     } else {
-  //       console.log("e", qR.x, qR.y , qR.z ,qR.w);
-  //       console.log("e1", e1.x,e1.y, e1.z,e1.w);
-  //       // console.log(e.z-e1.z, e.x-e1.x, -e.y-e1.y);
-  //       // x.rotation.set(e.z+e1.z, e.x-e1.y, -e.y+e1.x);
-  //
-  //       var e1q = new Quaternion(e1.w,e1.x, e1.y, e1.z);
-  //
-  //       var qR1 = qR.mul(e1q.inverse());
-  //       console.log("e1q", qR1.x,qR1.y, qR1.z,qR1.w);
-  //       x.quaternion.set(qR1.z, qR1.x, -qR1.y, qR1.w);
-  //       setLocal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
-  //       setGlobal(obj.id, qR1.x, qR1.y, qR1.z, qR1.w)
-  //     }
-  //     break;
-  //   case "RightArm":
-  //     var e = qte(qR)
-  //     var e1 = getParentNodeEuler(obj.id);
-  //         console.log(180 * e.x / Math.PI, 180 * e.y / Math.PI, 180 * e.z / Math.PI);
-  //         console.log(180 * e1.x / Math.PI, 180 * e1.y / Math.PI, 180 * e1.z / Math.PI);
-  //    // x.rotation.set(e.x, -e.y, e.z);
-  //         var fy, fx, fz;
-  //         fx = e.x -e1.x;
-  //         fy = -e.y +e1.y;
-  //         fz = e.z + e1.z;
-  //     x.rotation.set(fx, fy, fz);
-  //     console.log(180 * fx / Math.PI, 180 * fy / Math.PI, 180 * fz / Math.PI);
-  //         console.log("......")
-  //     setGlobal(obj.id, -e.x-e1.y, 2*Math.PI + e.y-e1.y, e.z-e1.z);
-  //     break;
-  //   default:
-  //     x.quaternion.set(qR.z, -qR.y, qR.x, qR.w);
-  //     break;
-  // }
 }
 
+function qte(q) {
+    var angles = {};
+    var den = Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+    q.w /= den;
+    q.x /= den;
+    q.y /= den;
+    q.z /= den;
 
+    angles.x = Math.atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y));
+    angles.y = Math.asin(2 * (q.w * q.y - q.z * q.x));
+    angles.z = Math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
 
+    return angles;
+}
 
 function setGlobal(id, x, y, z, w) {
   mac2Bones[id].global.x = x;
@@ -302,6 +227,5 @@ function quatern2rotMat(q) {
 }
 
 function getMovementValue(a, b) {
-  // return (a * freq + (0.5) * b * freq * freq)
   return a*freq;
 }
