@@ -27,7 +27,7 @@ ws.on('connection', function connection(ws) {
         data = data.split(',');
         var d = new Date();
         data[0] = d.getTime();
-        console.log(data);
+        // console.log(data);
         stream2.write(data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3] +'\n');
         stream1.write(data[0] + ',' + data[4] + ',' + data[5] + ',' + data[6] +'\n');
         stream3.write(data[0] + ',' + data[7] + ',' + data[8] + ',' + data[9] +'\n');
