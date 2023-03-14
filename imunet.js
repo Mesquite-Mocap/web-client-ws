@@ -29,6 +29,5 @@ ws.on('connection', function connection(ws) {
         stream1.write(data[0] + ',' + data[4] + ',' + data[5] + ',' + data[6] +'\n');
         stream3.write(data[0] + ',' + data[7] + ',' + data[8] + ',' + data[9] +'\n');
         // Write the received data to the local file
-        stream.write(data + '\n');
     });
 });
