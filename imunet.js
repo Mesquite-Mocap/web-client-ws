@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const fs = require('fs');
 
-const ws = new WebSocket.Server({ port: 8555 });
+const ws = new WebSocket.Server({ host: '0.0.0.0', port: 8555 });
 
 // Open a writable stream to the local file
 const stream = fs.createWriteStream('data.txt');
