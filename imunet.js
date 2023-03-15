@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const fs = require('fs');
 
 const ws = new WebSocket.Server({ host: '0.0.0.0', port: 8555 });
-var i = 0;
+var i = 7;
 // Open a writable stream to the local file
 
 // When a new websocket connection is established
@@ -16,21 +16,37 @@ ws.on('connection', function connection(ws) {
         fs.mkdirSync(dir);
     }
     i++;
-    var stream1 = fs.createWriteStream(dir + '/acce.csv');
-    var stream2 = fs.createWriteStream(dir + '/gyro.csv');
-    var stream3 = fs.createWriteStream(dir + '/magnet.csv');
+    var stream1 = fs.createWriteStream(dir + '/acce.txt');
+    var stream2 = fs.createWriteStream(dir + '/gyro.txt');
+    var stream3 = fs.createWriteStream(dir + '/magnet.txt');
+    var stream4 = fs.createWriteStream(dir + '/linacce.txt');
+    var stream5 = fs.createWriteStream(dir + '/gravity.txt');
 
     // When a message is received on the websocket connection
     ws.on('message', function incoming(data) {
         // console.log('Received message:', data);
         data = data.toString();
         data = data.split(',');
+        if (data.length != 13) {
+            console.log('Invalid data received');
+        }
+        else if (data != undefined) {
         var d = new Date();
         data[0] = d.getTime();
+        gX = data[4] - data[10]
+        gY = data[5] - data[11]
+        gZ = data[6] - data[12]
+        //limit gX to 3 decimals
+        gX = gX.toFixed(3);
+        gY = gY.toFixed(3);
+        gZ = gZ.toFixed(3);
         // console.log(data);
-        stream2.write(data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3] +'\n');
-        stream1.write(data[0] + ',' + data[4] + ',' + data[5] + ',' + data[6] +'\n');
-        stream3.write(data[0] + ',' + data[7] + ',' + data[8] + ',' + data[9] +'\n');
+        stream2.write(data[0] + ' ' + data[1] + ' ' + data[2] + ' ' + data[3] +'\n');
+        stream1.write(data[0] + ' ' + data[4] + ' ' + data[5] + ' ' + data[6] +'\n');
+        stream3.write(data[0] + ' ' + data[7] + ' ' + data[8] + ' ' + data[9] +'\n');
+        stream4.write(data[0] + ' ' + data[10] + ' ' + data[11] + ' ' + data[12] +'\n');
+        stream5.write(data[0] + ' ' + gX + ' ' + gY + ' ' + gZ +'\n');
         // Write the received data to the local file
+        }
     });
 });
